@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <style>
+        :root {
+            --bg: #f7f3ea;
+            --panel: #fffdf8;
+            --text: #2d1f13;
+            --muted: #7a6858;
+            --accent: #c96b32;
+            --accent-dark: #a55323;
+            --border: #eadfce;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background: linear-gradient(180deg, #fff9ef 0%, var(--bg) 100%);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 18px 48px;
+        }
+
+        .hero {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 14px 40px rgba(83, 52, 28, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .username {
+            margin-top: 14px;
+            display: inline-block;
+            background: #f7eadf;
+            color: var(--accent-dark);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .actions {
+            margin-top: 18px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 12px;
+            background: var(--accent);
+            color: white;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+        }
+
+        .status {
+            margin: 22px 0 16px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .orders {
+            display: grid;
+            gap: 16px;
+        }
+
+        .order-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 10px 26px rgba(83, 52, 28, 0.06);
+        }
+
+        .order-title {
+            margin: 0 0 10px;
+            font-size: 1.25rem;
+        }
+
+        .order-row {
+            margin: 6px 0;
+            color: var(--muted);
+        }
+
+        .empty {
+            background: var(--panel);
+            border: 1px dashed var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            text-align: center;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <h1>My Orders</h1>
+            <p class="subtitle">Only the orders placed by the signed-in user are shown here.</p>
+            <div class="username" id="loggedInUser">Checking login...</div>
+            <div class="actions">
+                <button id="refreshBtn" type="button">Refresh Orders</button>
+            </div>
+        </section>
+
+        <p class="status" id="statusMessage">Loading your orders...</p>
+        <section class="orders" id="ordersContainer"></section>
+    </main>
+
+    <script src="myorders.js"></script>
+</body>
+</html>
