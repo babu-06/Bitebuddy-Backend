@@ -17,6 +17,10 @@ import com.zaxxer.hikari.HikariDataSource;
 @Profile("!test")
 public class DatabaseConfig {
 
+	private static final String FALLBACK_JDBC_URL = "jdbc:postgresql://postgres.railway.internal:5432/railway";
+	private static final String FALLBACK_USERNAME = "postgres";
+	private static final String FALLBACK_PASSWORD = "WpmPxsOcTLazABPqWzOjyinacwIRyrHR";
+
 	@Bean
 	DataSource dataSource(Environment environment) {
 		HikariDataSource dataSource = new HikariDataSource();
@@ -51,8 +55,7 @@ public class DatabaseConfig {
 			return "jdbc:postgresql://" + host + ":" + port + "/" + database;
 		}
 
-		throw new IllegalStateException(
-				"Database configuration missing. Set SPRING_DATASOURCE_URL, JDBC_DATABASE_URL, DATABASE_URL, or PGHOST/PGPORT/PGDATABASE.");
+		return FALLBACK_JDBC_URL;
 	}
 
 	private String resolveUsername(Environment environment) {
@@ -67,7 +70,9 @@ public class DatabaseConfig {
 		}
 
 		Credentials credentials = credentialsFromUrl(environment);
-		return credentials.username();
+		return credentials.username() != null && !credentials.username().isBlank()
+				? credentials.username()
+				: FALLBACK_USERNAME;
 	}
 
 	private String resolvePassword(Environment environment) {
@@ -82,7 +87,9 @@ public class DatabaseConfig {
 		}
 
 		Credentials credentials = credentialsFromUrl(environment);
-		return credentials.password();
+		return credentials.password() != null
+				? credentials.password()
+				: FALLBACK_PASSWORD;
 	}
 
 	private Credentials credentialsFromUrl(Environment environment) {
@@ -92,18 +99,18 @@ public class DatabaseConfig {
 				"DATABASE_PUBLIC_URL",
 				"DATABASE_PRIVATE_URL");
 		if (rawDatabaseUrl == null || rawDatabaseUrl.startsWith("jdbc:")) {
-			return new Credentials("postgres", "");
+			return new Credentials(FALLBACK_USERNAME, FALLBACK_PASSWORD);
 		}
 
 		try {
 			URI uri = new URI(rawDatabaseUrl);
 			String userInfo = uri.getUserInfo();
 			if (userInfo == null || userInfo.isBlank()) {
-				return new Credentials("postgres", "");
+				return new Credentials(FALLBACK_USERNAME, FALLBACK_PASSWORD);
 			}
 
 			String[] parts = userInfo.split(":", 2);
-			String username = parts.length > 0 ? parts[0] : "postgres";
+			String username = parts.length > 0 ? parts[0] : FALLBACK_USERNAME;
 			String password = parts.length > 1 ? parts[1] : "";
 			return new Credentials(username, password);
 		} catch (URISyntaxException exception) {
