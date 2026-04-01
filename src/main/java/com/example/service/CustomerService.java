@@ -17,11 +17,12 @@ public class CustomerService {
 	CustomerRepository repo;
 
 	public boolean signup(String name, long phone, String username, String password, String email, String address) {
-		if (repo.existsById(username)) {
+		String normalizedUsername = normalizeUsername(username);
+		if (normalizedUsername.isEmpty() || repo.existsByUsernameIgnoreCase(normalizedUsername)) {
 			return false;
 		}
 		
-		Customer customer = new Customer(name,phone,username,password,email,address);
+		Customer customer = new Customer(name,phone,normalizedUsername,password,email,address);
 		repo.save(customer);
 		return true;
 		
@@ -34,7 +35,7 @@ public class CustomerService {
 	}
 
 	public Customer authenticate(String username, String password) {
-		Optional<Customer> customer = repo.findById(username);
+		Optional<Customer> customer = repo.findByUsernameIgnoreCase(normalizeUsername(username));
 		if (customer.isPresent() && customer.get().getPassword().equals(password)) {
 			return customer.get();
 		}
@@ -43,11 +44,11 @@ public class CustomerService {
 	}
 
 	public Customer getCustomer(String username) {
-		return repo.findById(username).orElse(null);
+		return repo.findByUsernameIgnoreCase(normalizeUsername(username)).orElse(null);
 	}
 
 	public Customer updateCustomer(String username, Customer updatedCustomer) {
-		return repo.findById(username)
+		return repo.findByUsernameIgnoreCase(normalizeUsername(username))
 				.map(existingCustomer -> {
 					existingCustomer.setName(updatedCustomer.getName());
 					existingCustomer.setPhone(updatedCustomer.getPhone());
@@ -56,6 +57,10 @@ public class CustomerService {
 					return repo.save(existingCustomer);
 				})
 				.orElse(null);
+	}
+
+	private String normalizeUsername(String username) {
+		return username == null ? "" : username.trim();
 	}
 
 }
